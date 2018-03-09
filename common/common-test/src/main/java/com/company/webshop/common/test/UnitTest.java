@@ -8,7 +8,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static org.junit.rules.ExpectedException.none;
 
 @RunWith(MockitoJUnitRunner.class)
-public class UnitTest {
+public abstract class UnitTest {
 
     @Rule
     public ExpectedException expectedException = none();
