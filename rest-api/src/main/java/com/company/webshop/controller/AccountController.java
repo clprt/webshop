@@ -1,9 +1,8 @@
 package com.company.webshop.controller;
 
-import com.company.webshop.repository.AccountRepository;
 import com.company.webshop.domain.Account;
+import com.company.webshop.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.websocket.server.PathParam;
 import java.net.URI;
 
 @RestController
@@ -20,11 +18,11 @@ import java.net.URI;
 public class AccountController {
 
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountService accountService;
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> createAccount(@RequestBody Account account) {
-        Account savedAccount = accountRepository.save(account);
+        Account savedAccount = accountService.createAccount(account);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -37,7 +35,7 @@ public class AccountController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResponseEntity<Account> retrieveAccount(@PathVariable("id") Long id) {
-        Account account = accountRepository.findById(id).get();
+        Account account = accountService.getAccountById(id);
         return ResponseEntity.ok(account);
     }
 

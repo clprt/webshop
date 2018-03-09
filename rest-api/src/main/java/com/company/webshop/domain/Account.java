@@ -1,7 +1,5 @@
 package com.company.webshop.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,16 +37,7 @@ public class Account implements Serializable {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    private Account() {} // JPA only
-
-    public Account(String firstName, String lastName, String emailAddress, String password, String address, String phoneNumber) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailAddress = emailAddress;
-        this.password = password;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-    }
+    private Account() {}
 
     public Long getId() {
         return id;
@@ -104,5 +93,57 @@ public class Account implements Serializable {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public static class AccountBuilder {
+
+        private Account account;
+
+        private AccountBuilder() {
+            this.account = new Account();
+        }
+
+        public static AccountBuilder account() {
+            return new AccountBuilder();
+        }
+
+        public Account build() {
+            return this.account;
+        }
+
+        public AccountBuilder withId(Long id) {
+            this.account.setId(id);
+            return this;
+        }
+
+        public AccountBuilder withFirstName(String firstName) {
+            this.account.setFirstName(firstName);
+            return this;
+        }
+
+        public AccountBuilder withLastName(String lastName) {
+            this.account.setLastName(lastName);
+            return this;
+        }
+
+        public AccountBuilder withEmailAddress(String emailAddress) {
+            this.account.setEmailAddress(emailAddress);
+            return this;
+        }
+
+        public AccountBuilder withPassword(String password) {
+            this.account.setPassword(password);
+            return this;
+        }
+
+        public AccountBuilder withAddress(String address) {
+            this.account.setAddress(address);
+            return this;
+        }
+
+        public AccountBuilder withPhoneNumber(String phoneNumber) {
+            this.account.setPhoneNumber(phoneNumber);
+            return this;
+        }
     }
 }
