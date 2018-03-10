@@ -1,6 +1,9 @@
 package com.company.webshop.controller;
 
 import com.company.webshop.domain.Account;
+import com.company.webshop.dto.AccountDto;
+import com.company.webshop.dto.CustomerDto;
+import com.company.webshop.mapper.AccountMapper;
 import com.company.webshop.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +22,12 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private AccountMapper accountMapper;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> createAccount(@RequestBody Account account) {
-        Account savedAccount = accountService.createAccount(account);
+    public ResponseEntity<?> createAccount(@RequestBody AccountDto accountDto) {
+        Account savedAccount = accountService.createAccount(accountMapper.toAccount(accountDto));
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -34,9 +39,8 @@ public class AccountController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public ResponseEntity<Account> retrieveAccount(@PathVariable("id") Long id) {
-        Account account = accountService.getAccountById(id);
-        return ResponseEntity.ok(account);
+    public ResponseEntity<CustomerDto> retrieveAccount(@PathVariable("id") Long id) {
+        CustomerDto customerDto = accountMapper.toCustomerDto(accountService.getAccountById(id));
+        return ResponseEntity.ok(customerDto);
     }
-
 }

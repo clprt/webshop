@@ -6,17 +6,17 @@
 
     <parent>
         <groupId>com.company.webshop</groupId>
-        <artifactId>restapi</artifactId>
+        <artifactId>common</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>common</artifactId>
+    <artifactId>common-aspects</artifactId>
 
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>common-test</module>
-        <module>common-aspects</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -1,16 +1,18 @@
 package com.company.webshop.domain;
 
+import com.company.webshop.common.aspects.ddd.ValueObject;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "account")
-public class Account implements Serializable {
+public class Account extends ValueObject {
+
     public static final String TABLE = "account";
     public static final String ID_COLUMN = TABLE + "_id";
 

@@ -3,6 +3,7 @@ package com.company.webshop.controller;
 import com.company.webshop.application.WebshopApplication;
 import com.company.webshop.common.test.ControllerTest;
 import com.company.webshop.domain.Account;
+import com.company.webshop.dto.AccountDto;
 import com.company.webshop.service.AccountServiceImplementation;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.context.WebApplicationContext;
 
 import static com.company.webshop.domain.AccountTestBuilder.anAccount;
+import static com.company.webshop.dto.AccountDtoTestBuilder.anAccountDto;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,7 +32,16 @@ public class AccountControllerTest extends ControllerTest {
     private static final String PASSWORD = "password";
     private static final String ADDRESS = "address";
     private static final String PHONE_NUMBER = "phoneNumber";
+    private static final AccountDto ACCOUNT_DTO = anAccountDto()
+            .withFirstName(FIRST_NAME)
+            .withLastName(LAST_NAME)
+            .withEmailAddress(EMAIL_ADDRESS)
+            .withPassword(PASSWORD)
+            .withAddress(ADDRESS)
+            .withPhoneNumber(PHONE_NUMBER)
+            .build();
     private static final Account ACCOUNT = anAccount()
+            .withId(1L)
             .withFirstName(FIRST_NAME)
             .withLastName(LAST_NAME)
             .withEmailAddress(EMAIL_ADDRESS)
@@ -54,7 +65,7 @@ public class AccountControllerTest extends ControllerTest {
     public void createAccount() throws Exception {
         mockMvc.perform(post("/api/customers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(json(ACCOUNT)))
+                .content(json(ACCOUNT_DTO)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("location", containsString("/api/customers/")));
     }
@@ -66,13 +77,11 @@ public class AccountControllerTest extends ControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(header().string("content-type", MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.id", is(account.getId().intValue())))
+                .andExpect(jsonPath("$.customerId", is(account.getId().intValue())))
                 .andExpect(jsonPath("$.firstName", is(FIRST_NAME)))
                 .andExpect(jsonPath("$.lastName", is(LAST_NAME)))
                 .andExpect(jsonPath("$.emailAddress", is(EMAIL_ADDRESS)))
-                .andExpect(jsonPath("$.password", is(PASSWORD)))
                 .andExpect(jsonPath("$.address", is(ADDRESS)))
                 .andExpect(jsonPath("$.phoneNumber", is(PHONE_NUMBER)));
     }
-
 }
