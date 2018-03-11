@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -26,7 +27,7 @@ public class AccountController {
     private AccountMapper accountMapper;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> createAccount(@RequestBody AccountDto accountDto) {
+    public ResponseEntity<?> createAccount(@Valid @RequestBody AccountDto accountDto) {
         Account savedAccount = accountService.createAccount(accountMapper.toAccount(accountDto));
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

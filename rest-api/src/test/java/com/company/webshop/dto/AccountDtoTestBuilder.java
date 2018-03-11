@@ -6,7 +6,7 @@ public class AccountDtoTestBuilder {
 
     private String firstName = "firstName";
     private String lastName = "lastName";
-    private String emailAddress = "emailAddress";
+    private String emailAddress = "name@domain";
     private String password = "password";
     private String address = "address";
     private String phoneNumber = "phoneNumber";

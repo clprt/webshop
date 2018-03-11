@@ -2,12 +2,24 @@ package com.company.webshop.dto;
 
 import com.company.webshop.common.aspects.ddd.ValueObject;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 public class AccountDto extends ValueObject {
 
+    @NotBlank(message = "Firstname cannot be null or blank")
     private String firstName;
+    @NotBlank(message = "Lastname cannot be null or blank")
     private String lastName;
+    @NotBlank(message = "Email address cannot be null or blank")
+    @Email(message = "Email address has an incorrect format")
     private String emailAddress;
+    @NotNull(message = "Password cannot be null")
+    @Size(min = 8, message = "Password must contain at least 8 characters")
     private String password;
+    @NotBlank(message = "Address cannot be null or blank")
     private String address;
     private String phoneNumber;
 
