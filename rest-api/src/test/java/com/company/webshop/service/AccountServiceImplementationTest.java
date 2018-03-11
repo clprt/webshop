@@ -1,5 +1,6 @@
 package com.company.webshop.service;
 
+import com.company.webshop.common.aspects.exception.ResourceNotFoundException;
 import com.company.webshop.common.test.UnitTest;
 import com.company.webshop.domain.Account;
 import com.company.webshop.repository.AccountRepository;
@@ -30,6 +31,7 @@ public class AccountServiceImplementationTest extends UnitTest {
             .withAddress(ADDRESS)
             .withPhoneNumber(PHONE_NUMBER)
             .build();
+    private static final String RESOURCE_NOT_FOUND = "Resource not found";
 
     @Mock
     private AccountRepository accountRepository;
@@ -38,12 +40,21 @@ public class AccountServiceImplementationTest extends UnitTest {
     private AccountServiceImplementation accountService;
 
     @Test
-    public void getAccountById_ReturnsAccount() {
+    public void getAccountById_WhenAccountExistsReturnsAccount() {
         when(accountRepository.findById(1L)).thenReturn(Optional.of(ACCOUNT));
 
         Account result = accountService.getAccountById(1L);
 
         assertThat(result).isEqualTo(ACCOUNT);
+    }
+
+    @Test
+    public void getAccountById_WhenAccountDoesNotExistThrowsResourceNotFoundException() throws Exception {
+        expectedException.expect(ResourceNotFoundException.class);
+        expectedException.expectMessage(RESOURCE_NOT_FOUND);
+        when(accountRepository.findById(1L)).thenReturn(Optional.empty());
+
+        accountService.getAccountById(1L);
     }
 
     @Test

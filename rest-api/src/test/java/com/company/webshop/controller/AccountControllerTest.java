@@ -49,6 +49,7 @@ public class AccountControllerTest extends ControllerTest {
             .withAddress(ADDRESS)
             .withPhoneNumber(PHONE_NUMBER)
             .build();
+    private static final String RESOURCE_NOT_FOUND = "Resource not found";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -83,5 +84,13 @@ public class AccountControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.emailAddress", is(EMAIL_ADDRESS)))
                 .andExpect(jsonPath("$.address", is(ADDRESS)))
                 .andExpect(jsonPath("$.phoneNumber", is(PHONE_NUMBER)));
+    }
+
+    @Test
+    public void retrieveAccount_NoAccountFoundReturnsResourceNotFoundExceptionResponse() throws Exception {
+        mockMvc.perform(get("/api/customers/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error[0]", is(RESOURCE_NOT_FOUND)));
     }
 }
