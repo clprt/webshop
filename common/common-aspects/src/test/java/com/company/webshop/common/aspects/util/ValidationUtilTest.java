@@ -9,8 +9,8 @@ import org.springframework.validation.ObjectError;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.Mockito.when;
 
 public class ValidationUtilTest extends UnitTest {
@@ -22,10 +22,7 @@ public class ValidationUtilTest extends UnitTest {
 
     @Test
     public void getDefaultMessages() {
-        ArrayList<ObjectError> objectErrors = newArrayList();
-        objectErrors.add(new ObjectError("ObjectName", MESSAGE_1));
-        objectErrors.add(new ObjectError("ObjectName", MESSAGE_2));
-        when(bindingResult.getAllErrors()).thenReturn(objectErrors);
+        when(bindingResult.getAllErrors()).thenReturn(newArrayList(new ObjectError("ObjectName", MESSAGE_1), new ObjectError("ObjectName", MESSAGE_2)));
 
         List<String> defaultMessages = ValidationUtil.getDefaultMessages(bindingResult);
 

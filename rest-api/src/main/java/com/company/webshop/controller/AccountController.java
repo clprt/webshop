@@ -16,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -28,7 +29,9 @@ public class AccountController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> createAccount(@Valid @RequestBody AccountDto accountDto) {
-        Account savedAccount = accountService.createAccount(accountMapper.toAccount(accountDto));
+        Account account = accountMapper.toAccount(accountDto);
+        accountService.validateEmailAddressIsUnique(account);
+        Account savedAccount = accountService.createAccount(account);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -40,7 +43,8 @@ public class AccountController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public ResponseEntity<CustomerDto> retrieveAccount(@PathVariable("id") Long id) {
+    public ResponseEntity<CustomerDto> retrieveAccount(Principal principal, @PathVariable("id") Long id) {
+        accountService.checkAuthorization(principal, id);
         CustomerDto customerDto = accountMapper.toCustomerDto(accountService.getAccountById(id));
         return ResponseEntity.ok(customerDto);
     }

@@ -5,13 +5,19 @@ import com.company.webshop.common.test.ControllerTest;
 import com.company.webshop.domain.Account;
 import com.company.webshop.dto.AccountDto;
 import com.company.webshop.service.AccountServiceImplementation;
+import com.sun.security.auth.UserPrincipal;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.company.webshop.common.aspects.exception.ExceptionMessage.EMAIL_ADDRESS_ALREADY_IN_USE;
+import static com.company.webshop.common.aspects.exception.ExceptionMessage.FORBIDDEN;
+import static com.company.webshop.common.aspects.exception.ExceptionMessage.RESOURCE_NOT_FOUND;
 import static com.company.webshop.domain.AccountTestBuilder.anAccount;
 import static com.company.webshop.dto.AccountDtoTestBuilder.anAccountDto;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -56,7 +62,6 @@ public class AccountControllerTest extends ControllerTest {
             .withAddress("")
             .build();
     private static final Account ACCOUNT = anAccount()
-            .withId(1L)
             .withFirstName(FIRST_NAME)
             .withLastName(LAST_NAME)
             .withEmailAddress(EMAIL_ADDRESS)
@@ -64,7 +69,10 @@ public class AccountControllerTest extends ControllerTest {
             .withAddress(ADDRESS)
             .withPhoneNumber(PHONE_NUMBER)
             .build();
-    private static final String RESOURCE_NOT_FOUND = "Resource not found";
+    private static final String OTHER_EMAIL_ADDRESS = "othername@domain";
+    private static final Account OTHER_ACCOUNT = anAccount()
+            .withEmailAddress(OTHER_EMAIL_ADDRESS)
+            .build();
     public static final String FIRSTNAME_CANNOT_BE_NULL_OR_BLANK = "Firstname cannot be null or blank";
     public static final String LASTNAME_CANNOT_BE_NULL_OR_BLANK = "Lastname cannot be null or blank";
     public static final String EMAIL_ADDRESS_CANNOT_BE_NULL_OR_BLANK = "Email address cannot be null or blank";
@@ -142,9 +150,20 @@ public class AccountControllerTest extends ControllerTest {
     }
 
     @Test
-    public void retrieveAccount() throws Exception {
+    public void createAccount_AccountWithEmailAddressAlreadyInUseReturnsConflictResponseWithIndicativeErrorMessage() throws Exception {
+        Account account = accountService.createAccount(ACCOUNT);
+        mockMvc.perform(post("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(anAccountDto().withEmailAddress(EMAIL_ADDRESS).build())))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error[0]", is(EMAIL_ADDRESS_ALREADY_IN_USE.getValue())));
+    }
+
+    @Test
+    public void retrieveAccount_UserCorrespondingToIdGetsCustomerDetails() throws Exception {
         Account account = accountService.createAccount(ACCOUNT);
         mockMvc.perform(get("/api/customers/" + account.getId())
+                .principal(new UserPrincipal(account.getEmailAddress()))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(header().string("content-type", MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -157,10 +176,38 @@ public class AccountControllerTest extends ControllerTest {
     }
 
     @Test
-    public void retrieveAccount_NoAccountFoundReturnsResourceNotFoundExceptionResponse() throws Exception {
+    public void retrieveAccount_AdminGetsCustomerDetails() throws Exception {
+        Account account = accountService.createAccount(ACCOUNT);
+        mockMvc.perform(get("/api/customers/" + account.getId())
+                .principal(new UserPrincipal("admin"))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(header().string("content-type", MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.customerId", is(account.getId().intValue())))
+                .andExpect(jsonPath("$.firstName", is(FIRST_NAME)))
+                .andExpect(jsonPath("$.lastName", is(LAST_NAME)))
+                .andExpect(jsonPath("$.emailAddress", is(EMAIL_ADDRESS)))
+                .andExpect(jsonPath("$.address", is(ADDRESS)))
+                .andExpect(jsonPath("$.phoneNumber", is(PHONE_NUMBER)));
+    }
+
+    @Test
+    public void retrieveAccount_UserCorrespondingToAnotherIdGetsForbiddenResponse() throws Exception {
+        Account account = accountService.createAccount(ACCOUNT);
+        Account otherAccount = accountService.createAccount(OTHER_ACCOUNT);
+        mockMvc.perform(get("/api/customers/" + account.getId())
+                .principal(new UserPrincipal(otherAccount.getEmailAddress()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error[0]", is(FORBIDDEN.getValue())));
+    }
+
+    @Test
+    public void retrieveAccount_AdminGetsResourceNotFoundResponseWhenNoAccountCorrespondsToId() throws Exception {
         mockMvc.perform(get("/api/customers/1")
+                .principal(new UserPrincipal("admin"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error[0]", is(RESOURCE_NOT_FOUND)));
+                .andExpect(jsonPath("$.error[0]", is(RESOURCE_NOT_FOUND.getValue())));
     }
 }
