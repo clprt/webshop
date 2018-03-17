@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS `account`;
-
 CREATE TABLE `account` (
     `account_id` bigint(20) NOT NULL AUTO_INCREMENT,
     `first_name` varchar(255) NOT NULL,
