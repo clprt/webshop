@@ -6,20 +6,28 @@ import com.company.webshop.domain.Account;
 import com.company.webshop.dto.AccountDto;
 import com.company.webshop.service.AccountServiceImplementation;
 import com.sun.security.auth.UserPrincipal;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.context.WebApplicationContext;
 
 import static com.company.webshop.common.aspects.exception.ExceptionMessage.EMAIL_ADDRESS_ALREADY_IN_USE;
 import static com.company.webshop.common.aspects.exception.ExceptionMessage.FORBIDDEN;
 import static com.company.webshop.common.aspects.exception.ExceptionMessage.RESOURCE_NOT_FOUND;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.ADDRESS_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.EMAIL_ADDRESS_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.EMAIL_ADDRESS_HAS_AN_INCORRECT_FORMAT;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.FIELD_LENGTH_EXCEEDED;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.FIRSTNAME_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.LASTNAME_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.PASSWORD_CANNOT_BE_NULL;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.PASSWORD_MUST_CONTAIN_AT_LEAST_8_CHARACTERS;
 import static com.company.webshop.domain.AccountTestBuilder.anAccount;
 import static com.company.webshop.dto.AccountDtoTestBuilder.anAccountDto;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -39,6 +47,9 @@ public class AccountControllerTest extends ControllerTest {
     private static final String PASSWORD = "password";
     private static final String ADDRESS = "address";
     private static final String PHONE_NUMBER = "phoneNumber";
+    private static final String STRING_256 = StringUtils.repeat("x", 256);
+    private static final String EMAIL_ADDRESS_129 = StringUtils.repeat("x", 64).concat("@").concat(StringUtils.repeat("x", 64));
+    private static final String STRING_26 = StringUtils.repeat("x", 26);
     private static final AccountDto ACCOUNT_DTO = anAccountDto()
             .withFirstName(FIRST_NAME)
             .withLastName(LAST_NAME)
@@ -61,6 +72,14 @@ public class AccountControllerTest extends ControllerTest {
             .withPassword("")
             .withAddress("")
             .build();
+    private static final AccountDto ACCOUNT_DTO_WITH_EXCEEDED_FIELD_LENGTHS = anAccountDto()
+            .withFirstName(STRING_256)
+            .withLastName(STRING_256)
+            .withEmailAddress(EMAIL_ADDRESS)
+            .withPassword(STRING_256)
+            .withAddress(STRING_256)
+            .withPhoneNumber(STRING_26)
+            .build();
     private static final Account ACCOUNT = anAccount()
             .withFirstName(FIRST_NAME)
             .withLastName(LAST_NAME)
@@ -73,13 +92,6 @@ public class AccountControllerTest extends ControllerTest {
     private static final Account OTHER_ACCOUNT = anAccount()
             .withEmailAddress(OTHER_EMAIL_ADDRESS)
             .build();
-    public static final String FIRSTNAME_CANNOT_BE_NULL_OR_BLANK = "Firstname cannot be null or blank";
-    public static final String LASTNAME_CANNOT_BE_NULL_OR_BLANK = "Lastname cannot be null or blank";
-    public static final String EMAIL_ADDRESS_CANNOT_BE_NULL_OR_BLANK = "Email address cannot be null or blank";
-    public static final String EMAIL_ADDRESS_HAS_AN_INCORRECT_FORMAT = "Email address has an incorrect format";
-    public static final String PASSWORD_CANNOT_BE_NULL = "Password cannot be null";
-    public static final String PASSWORD_MUST_CONTAIN_AT_LEAST_8_CHARACTERS = "Password must contain at least 8 characters";
-    public static final String ADDRESS_CANNOT_BE_NULL_OR_BLANK = "Address cannot be null or blank";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -210,4 +222,29 @@ public class AccountControllerTest extends ControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error[0]", is(RESOURCE_NOT_FOUND.getValue())));
     }
+
+    @Test
+    public void createAccount_AccountWithExceededFieldLengthsReturnsBadRequestResponseWithIndicativeErrorMessages() throws Exception {
+        mockMvc.perform(post("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(ACCOUNT_DTO_WITH_EXCEEDED_FIELD_LENGTHS)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", contains(
+                        FIELD_LENGTH_EXCEEDED,
+                        FIELD_LENGTH_EXCEEDED,
+                        FIELD_LENGTH_EXCEEDED,
+                        FIELD_LENGTH_EXCEEDED,
+                        FIELD_LENGTH_EXCEEDED
+                )));
+    }
+
+    @Test
+    public void createAccount_AccountWithTooLongEmailAddressReturnsBadRequestResponseWithIndicativeErrorMessage() throws Exception {
+        mockMvc.perform(post("/api/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(anAccountDto().withEmailAddress(EMAIL_ADDRESS_129).build())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error[0]", is(EMAIL_ADDRESS_HAS_AN_INCORRECT_FORMAT)));
+    }
+
 }

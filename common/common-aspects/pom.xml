@@ -29,6 +29,16 @@
             <groupId>com.company.webshop</groupId>
             <artifactId>common-test</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-reflect</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

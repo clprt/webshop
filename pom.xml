@@ -71,11 +71,22 @@
                 <artifactId>guava</artifactId>
                 <version>21.0</version>
             </dependency>
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>2.0.1.Final</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.company.webshop</groupId>
                 <artifactId>common-test</artifactId>
                 <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-reflect</artifactId>
+                <version>1.4.1</version>
                 <scope>test</scope>
             </dependency>
 

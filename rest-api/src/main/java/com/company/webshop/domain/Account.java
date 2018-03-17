@@ -27,7 +27,7 @@ public class Account extends ValueObject {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "email_address", unique = true, nullable = false)
+    @Column(name = "email_address", unique = true, nullable = false, length = 128)
     private String emailAddress;
 
     @Column(name = "password", nullable = false)
@@ -36,7 +36,7 @@ public class Account extends ValueObject {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", length = 25)
     private String phoneNumber;
 
     private Account() {}

@@ -1,26 +1,40 @@
 package com.company.webshop.dto;
 
 import com.company.webshop.common.aspects.ddd.ValueObject;
+import com.company.webshop.common.aspects.validation.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import static com.company.webshop.common.aspects.validation.ValidationMessage.ADDRESS_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.EMAIL_ADDRESS_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.EMAIL_ADDRESS_HAS_AN_INCORRECT_FORMAT;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.FIRSTNAME_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.LASTNAME_CANNOT_BE_NULL_OR_BLANK;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.PASSWORD_CANNOT_BE_NULL;
+import static com.company.webshop.common.aspects.validation.ValidationMessage.PASSWORD_MUST_CONTAIN_AT_LEAST_8_CHARACTERS;
+
 public class AccountDto extends ValueObject {
 
-    @NotBlank(message = "Firstname cannot be null or blank")
+    @Length
+    @NotBlank(message = FIRSTNAME_CANNOT_BE_NULL_OR_BLANK)
     private String firstName;
-    @NotBlank(message = "Lastname cannot be null or blank")
+    @Length
+    @NotBlank(message = LASTNAME_CANNOT_BE_NULL_OR_BLANK)
     private String lastName;
-    @NotBlank(message = "Email address cannot be null or blank")
-    @Email(message = "Email address has an incorrect format")
+    @NotBlank(message = EMAIL_ADDRESS_CANNOT_BE_NULL_OR_BLANK)
+    @Email(message = EMAIL_ADDRESS_HAS_AN_INCORRECT_FORMAT)
     private String emailAddress;
-    @NotNull(message = "Password cannot be null")
-    @Size(min = 8, message = "Password must contain at least 8 characters")
+    @Length
+    @NotNull(message = PASSWORD_CANNOT_BE_NULL)
+    @Size(min = 8, message = PASSWORD_MUST_CONTAIN_AT_LEAST_8_CHARACTERS)
     private String password;
-    @NotBlank(message = "Address cannot be null or blank")
+    @Length
+    @NotBlank(message = ADDRESS_CANNOT_BE_NULL_OR_BLANK)
     private String address;
+    @Length(value = 25)
     private String phoneNumber;
 
     public String getFirstName() {
