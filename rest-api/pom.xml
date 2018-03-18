@@ -33,10 +33,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.company.webshop</groupId>
@@ -56,6 +52,21 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <configuration>
+                    <url>jdbc:mysql://localhost:33306</url>
+                    <user>wsuser</user>
+                    <password>wsuser</password>
+                    <schemas>
+                        <schema>webshop</schema>
+                    </schemas>
+                    <locations>
+                        <location>db/migration</location>
+                    </locations>
+                </configuration>
             </plugin>
         </plugins>
     </build>

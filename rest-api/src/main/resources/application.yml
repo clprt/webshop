@@ -1,0 +1,12 @@
+spring:
+  main:
+    banner-mode: "off"
+  datasource:
+    url: jdbc:mysql://localhost:33306/webshop
+    username: wsuser
+    password: wsuser
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    hibernate:
+      ddl-auto: update
