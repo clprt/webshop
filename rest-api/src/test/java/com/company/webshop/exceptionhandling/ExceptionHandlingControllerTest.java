@@ -1,6 +1,7 @@
 package com.company.webshop.exceptionhandling;
 
-import com.company.webshop.common.aspects.exception.EmailAddressAlreadyInUseWebshopException;
+import com.company.webshop.common.aspects.exception.ExceptionMessage;
+import com.company.webshop.common.aspects.exception.NotUniqueWebShopException;
 import com.company.webshop.common.aspects.exception.ExceptionResponse;
 import com.company.webshop.common.aspects.exception.ForbiddenWebshopException;
 import com.company.webshop.common.aspects.exception.ResourceNotFoundWebshopException;
@@ -14,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import static com.company.webshop.common.aspects.exception.ExceptionMessage.EMAIL_ADDRESS_ALREADY_IN_USE;
 import static com.company.webshop.common.aspects.exception.ExceptionMessage.FORBIDDEN;
 import static com.company.webshop.common.aspects.exception.ExceptionMessage.RESOURCE_NOT_FOUND;
 import static com.google.common.collect.Lists.newArrayList;
@@ -25,6 +25,7 @@ public class ExceptionHandlingControllerTest extends UnitTest {
 
     private static final String MESSAGE_1 = "Message 1";
     private static final String MESSAGE_2 = "Message 2";
+    public static final ExceptionMessage PROPERTY_ALREADY_IN_USE = ExceptionMessage.EMAIL_ADDRESS_ALREADY_IN_USE;
 
     @Mock
     private MethodArgumentNotValidException methodArgumentNotValidException;
@@ -58,20 +59,19 @@ public class ExceptionHandlingControllerTest extends UnitTest {
     public void accessControlViolation_ReturnsResponseEntityWithForbiddenErrorAndForbiddenErrorMessage() {
         ForbiddenWebshopException forbiddenWebshopException = new ForbiddenWebshopException(FORBIDDEN);
 
-        ResponseEntity<ExceptionResponse> result = exceptionHandlingController.accessControlViolation(forbiddenWebshopException);
+        ResponseEntity<?> result = exceptionHandlingController.accessControlViolation(forbiddenWebshopException);
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-        assertThat(result.getBody().getError()).isEqualTo(newArrayList(FORBIDDEN.getValue()));
     }
 
     @Test
-    public void emailAddressNotUnique_ReturnsResponseEntityWithConflictErrorAndEmailAddressAlreadyInUseErrorMessage() {
-        EmailAddressAlreadyInUseWebshopException emailAddressAlreadyInUseWebshopException = new EmailAddressAlreadyInUseWebshopException(EMAIL_ADDRESS_ALREADY_IN_USE);
+    public void propertyNotUnique_ReturnsResponseEntityWithConflictErrorAndPropertyAlreadyInUseErrorMessage() {
+        NotUniqueWebShopException notUniqueWebShopException = new NotUniqueWebShopException(PROPERTY_ALREADY_IN_USE);
 
-        ResponseEntity<ExceptionResponse> result = exceptionHandlingController.emailAddressNotUnique(emailAddressAlreadyInUseWebshopException);
+        ResponseEntity<ExceptionResponse> result = exceptionHandlingController.propertyNotUnique(notUniqueWebShopException);
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(result.getBody().getError()).isEqualTo(newArrayList(EMAIL_ADDRESS_ALREADY_IN_USE.getValue()));
+        assertThat(result.getBody().getError()).isEqualTo(newArrayList(PROPERTY_ALREADY_IN_USE.getValue()));
     }
 
 }

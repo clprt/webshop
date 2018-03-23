@@ -1,6 +1,6 @@
 package com.company.webshop.service;
 
-import com.company.webshop.common.aspects.exception.EmailAddressAlreadyInUseWebshopException;
+import com.company.webshop.common.aspects.exception.NotUniqueWebShopException;
 import com.company.webshop.common.aspects.exception.ForbiddenWebshopException;
 import com.company.webshop.common.aspects.exception.ResourceNotFoundWebshopException;
 import com.company.webshop.common.test.UnitTest;
@@ -47,11 +47,11 @@ public class AccountServiceImplementationTest extends UnitTest {
             .withId(OTHER_ID)
             .withEmailAddress(EMAIL_ADDRESS)
             .build();
-    private static final String ALREADY_EXISTING_EMAIL_ADDRESS = "AlreadyExistingEmailAddress";
+    private static final String ALREADY_EXISTING_EMAIL_ADDRESS = "alreadyExistingEmailAddress";
     private static final Account ACCOUNT_WITH_ALREADY_EXISTING_EMAIL_ADDRESS = anAccount()
             .withEmailAddress(ALREADY_EXISTING_EMAIL_ADDRESS)
             .build();
-    private static final String NOT_YET_EXISTING_EMAIL_ADDRESS = "NotYetExistingEmailAddress";
+    private static final String NOT_YET_EXISTING_EMAIL_ADDRESS = "notYetExistingEmailAddress";
     private static final Account ACCOUNT_WITH_NOT_YET_EXISTING_EMAIL_ADDRESS = anAccount()
             .withEmailAddress(NOT_YET_EXISTING_EMAIL_ADDRESS)
             .build();
@@ -66,9 +66,9 @@ public class AccountServiceImplementationTest extends UnitTest {
 
     @Test
     public void getAccountById_WhenAccountExistsReturnsAccount() {
-        when(accountRepository.findById(1L)).thenReturn(Optional.of(ACCOUNT));
+        when(accountRepository.findById(ID)).thenReturn(Optional.of(ACCOUNT));
 
-        Account result = accountService.getAccountById(1L);
+        Account result = accountService.getAccountById(ID);
 
         assertThat(result).isEqualTo(ACCOUNT);
     }
@@ -77,15 +77,15 @@ public class AccountServiceImplementationTest extends UnitTest {
     public void getAccountById_WhenAccountDoesNotExistThrowsResourceNotFoundWebshopException() throws Exception {
         expectedException.expect(ResourceNotFoundWebshopException.class);
         expectedException.expectMessage(RESOURCE_NOT_FOUND.getValue());
-        when(accountRepository.findById(1L)).thenReturn(Optional.empty());
+        when(accountRepository.findById(ID)).thenReturn(Optional.empty());
 
-        accountService.getAccountById(1L);
+        accountService.getAccountById(ID);
     }
 
     @Test
     public void createAccount_ReturnsCreatedAccount() {
         Account account = anAccount()
-                .withId(1L)
+                .withId(ID)
                 .withFirstName(FIRST_NAME)
                 .withLastName(LAST_NAME)
                 .withEmailAddress(EMAIL_ADDRESS)
@@ -111,7 +111,7 @@ public class AccountServiceImplementationTest extends UnitTest {
     public void checkAuthorization_AllowsAccountAdmin() {
         when(principal.getName()).thenReturn("admin");
 
-        accountService.checkAuthorization(principal, 1L);
+        accountService.checkAuthorization(principal, ID);
     }
 
     @Test
@@ -140,8 +140,8 @@ public class AccountServiceImplementationTest extends UnitTest {
     }
 
     @Test
-    public void validateEmailAddressIsUnique_ThrowsEmailAddressAlreadyInUseWebshopExceptionForExistingEmailAddress() throws Exception {
-        expectedException.expect(EmailAddressAlreadyInUseWebshopException.class);
+    public void validateEmailAddressIsUnique_ThrowsNotUniqueWebshopExceptionWithMessageEmailAddressAlreadyInUse() throws Exception {
+        expectedException.expect(NotUniqueWebShopException.class);
         expectedException.expectMessage(EMAIL_ADDRESS_ALREADY_IN_USE.getValue());
         when(accountRepository.findByEmailAddress(ALREADY_EXISTING_EMAIL_ADDRESS)).thenReturn(Optional.of(ACCOUNT));
 

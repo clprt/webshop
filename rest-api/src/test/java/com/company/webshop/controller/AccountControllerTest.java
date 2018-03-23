@@ -4,7 +4,7 @@ import com.company.webshop.application.WebshopApplication;
 import com.company.webshop.common.test.ControllerTest;
 import com.company.webshop.domain.Account;
 import com.company.webshop.dto.AccountDto;
-import com.company.webshop.service.AccountServiceImplementation;
+import com.company.webshop.service.AccountService;
 import com.sun.security.auth.UserPrincipal;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -12,10 +12,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.web.context.WebApplicationContext;
 
 import static com.company.webshop.common.aspects.exception.ExceptionMessage.EMAIL_ADDRESS_ALREADY_IN_USE;
-import static com.company.webshop.common.aspects.exception.ExceptionMessage.FORBIDDEN;
 import static com.company.webshop.common.aspects.exception.ExceptionMessage.RESOURCE_NOT_FOUND;
 import static com.company.webshop.common.aspects.validation.ValidationMessage.ADDRESS_CANNOT_BE_NULL_OR_BLANK;
 import static com.company.webshop.common.aspects.validation.ValidationMessage.EMAIL_ADDRESS_CANNOT_BE_NULL_OR_BLANK;
@@ -31,12 +29,12 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @SpringBootTest(classes = WebshopApplication.class)
 public class AccountControllerTest extends ControllerTest {
@@ -94,13 +92,10 @@ public class AccountControllerTest extends ControllerTest {
             .build();
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-    @Autowired
-    private AccountServiceImplementation accountService;
+    private AccountService accountService;
 
     @Before
     public void setup() throws Exception {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
         accountService.deleteAllAccounts();
     }
 
@@ -175,7 +170,7 @@ public class AccountControllerTest extends ControllerTest {
     public void retrieveAccount_UserCorrespondingToIdGetsCustomerDetails() throws Exception {
         Account account = accountService.createAccount(ACCOUNT);
         mockMvc.perform(get("/api/customers/" + account.getId())
-                .principal(new UserPrincipal(account.getEmailAddress()))
+                .with(user(account.getEmailAddress()))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(header().string("content-type", MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -191,7 +186,7 @@ public class AccountControllerTest extends ControllerTest {
     public void retrieveAccount_AdminGetsCustomerDetails() throws Exception {
         Account account = accountService.createAccount(ACCOUNT);
         mockMvc.perform(get("/api/customers/" + account.getId())
-                .principal(new UserPrincipal("admin"))
+                .with(user("admin"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(header().string("content-type", MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -208,16 +203,15 @@ public class AccountControllerTest extends ControllerTest {
         Account account = accountService.createAccount(ACCOUNT);
         Account otherAccount = accountService.createAccount(OTHER_ACCOUNT);
         mockMvc.perform(get("/api/customers/" + account.getId())
-                .principal(new UserPrincipal(otherAccount.getEmailAddress()))
+                .with(user(otherAccount.getEmailAddress()))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.error[0]", is(FORBIDDEN.getValue())));
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void retrieveAccount_AdminGetsResourceNotFoundResponseWhenNoAccountCorrespondsToId() throws Exception {
         mockMvc.perform(get("/api/customers/1")
-                .principal(new UserPrincipal("admin"))
+                .with(user("admin"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error[0]", is(RESOURCE_NOT_FOUND.getValue())));

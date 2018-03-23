@@ -1,6 +1,6 @@
 package com.company.webshop.service;
 
-import com.company.webshop.common.aspects.exception.EmailAddressAlreadyInUseWebshopException;
+import com.company.webshop.common.aspects.exception.NotUniqueWebShopException;
 import com.company.webshop.common.aspects.exception.ForbiddenWebshopException;
 import com.company.webshop.common.aspects.exception.ResourceNotFoundWebshopException;
 import com.company.webshop.domain.Account;
@@ -50,7 +50,7 @@ public class AccountServiceImplementation implements AccountService {
     public void validateEmailAddressIsUnique(Account account) {
         accountRepository.findByEmailAddress(account.getEmailAddress())
                 .ifPresent(user -> {
-                    throw new EmailAddressAlreadyInUseWebshopException(EMAIL_ADDRESS_ALREADY_IN_USE);
+                    throw new NotUniqueWebShopException(EMAIL_ADDRESS_ALREADY_IN_USE);
                 });
     }
 }

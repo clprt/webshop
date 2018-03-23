@@ -1,6 +1,6 @@
 package com.company.webshop.exceptionhandling;
 
-import com.company.webshop.common.aspects.exception.EmailAddressAlreadyInUseWebshopException;
+import com.company.webshop.common.aspects.exception.NotUniqueWebShopException;
 import com.company.webshop.common.aspects.exception.ExceptionResponse;
 import com.company.webshop.common.aspects.exception.ForbiddenWebshopException;
 import com.company.webshop.common.aspects.exception.ResourceNotFoundWebshopException;
@@ -33,14 +33,12 @@ public class ExceptionHandlingController {
     }
 
     @ExceptionHandler(ForbiddenWebshopException.class)
-    public ResponseEntity<ExceptionResponse> accessControlViolation(ForbiddenWebshopException ex) {
-        ExceptionResponse response = new ExceptionResponse();
-        response.setError(newArrayList(ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    public ResponseEntity<?> accessControlViolation(ForbiddenWebshopException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @ExceptionHandler(EmailAddressAlreadyInUseWebshopException.class)
-    public ResponseEntity<ExceptionResponse> emailAddressNotUnique(EmailAddressAlreadyInUseWebshopException ex) {
+    @ExceptionHandler(NotUniqueWebShopException.class)
+    public ResponseEntity<ExceptionResponse> propertyNotUnique(NotUniqueWebShopException ex) {
         ExceptionResponse response = new ExceptionResponse();
         response.setError(newArrayList(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
