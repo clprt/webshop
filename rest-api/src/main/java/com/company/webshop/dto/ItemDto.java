@@ -1,14 +1,23 @@
 package com.company.webshop.dto;
 
 import com.company.webshop.common.aspects.ddd.ValueObject;
+import com.company.webshop.common.aspects.validation.Length;
+import com.company.webshop.common.aspects.validation.Price;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+
+import static com.company.webshop.common.aspects.validation.ValidationMessage.ITEM_NAME_CANNOT_BE_NULL_OR_BLANK;
 
 public class ItemDto extends ValueObject {
 
     private Long itemId;
+    @Length
+    @NotBlank(message = ITEM_NAME_CANNOT_BE_NULL_OR_BLANK)
     private String name;
+    @Length
     private String description;
+    @Price(value = 7)
     private BigDecimal price;
 
     private ItemDto() {

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 
 import static com.company.webshop.domain.ItemTestBuilder.anItem;
 import static com.company.webshop.dto.ItemDtoTestBuilder.anItemDto;
+import static java.math.BigDecimal.ROUND_UNNECESSARY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ItemMapperTest extends UnitTest {
@@ -57,4 +58,32 @@ public class ItemMapperTest extends UnitTest {
                 .build();
         assertThat(itemDto).isEqualTo(expected);
     }
+
+    @Test
+    public void toItem_RoundsPriceUp() {
+        ItemDto itemDto = anItemDto().withPrice(BigDecimal.valueOf(12.495)).build();
+
+        Item result = itemMapper.toItem(itemDto);
+
+        assertThat(result.getPrice().compareTo(BigDecimal.valueOf(12.5))).isZero();
+    }
+
+    @Test
+    public void toItem_RoundsPriceDown() {
+        ItemDto itemDto = anItemDto().withPrice(BigDecimal.valueOf(12.49499)).build();
+
+        Item result = itemMapper.toItem(itemDto);
+
+        assertThat(result.getPrice().compareTo(BigDecimal.valueOf(12.49))).isZero();
+    }
+
+    @Test
+    public void toItem_ConvertsPriceToTwoDecimals() {
+        ItemDto itemDto = anItemDto().withPrice(BigDecimal.valueOf(12.3)).build();
+
+        Item result = itemMapper.toItem(itemDto);
+
+        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(12.3).setScale(2));
+    }
+
 }

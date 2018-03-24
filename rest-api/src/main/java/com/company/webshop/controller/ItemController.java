@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -25,7 +26,7 @@ public class ItemController {
     private ItemMapper itemMapper;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> createItem(@RequestBody ItemDto itemDto) {
+    public ResponseEntity<?> createItem(@Valid @RequestBody ItemDto itemDto) {
         Item item = itemMapper.toItem(itemDto);
         itemService.validateItemNameIsUnique(item);
         Item savedItem = itemService.createItem(item);

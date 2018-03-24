@@ -5,7 +5,6 @@ import com.company.webshop.common.test.ControllerTest;
 import com.company.webshop.domain.Account;
 import com.company.webshop.dto.AccountDto;
 import com.company.webshop.service.AccountService;
-import com.sun.security.auth.UserPrincipal;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;

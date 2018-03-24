@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import static com.company.webshop.domain.Item.ItemBuilder.item;
 import static com.company.webshop.dto.ItemDto.ItemDtoBuilder.itemDto;
+import static java.math.BigDecimal.ROUND_HALF_UP;
 
 @Component
 public class ItemMapper {
@@ -14,7 +15,7 @@ public class ItemMapper {
         return item()
                 .withName(itemDto.getName())
                 .withDescription(itemDto.getDescription())
-                .withPrice(itemDto.getPrice())
+                .withPrice(itemDto.getPrice().setScale(2, ROUND_HALF_UP))
                 .build();
     }
 
